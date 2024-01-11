@@ -20,6 +20,7 @@ class Wlpp(ConanFile):
 
     def requirements(self):
         self.requires("fmt/10.1.1")
+        self.requires("tinyxml2/10.0.0")
 
     def generate(self):
         deps = CMakeDeps(self)

@@ -12,6 +12,7 @@ Checks: >
   -altera-id-dependent-backward-branch,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
+  -readability-identifier-length,
   -altera-struct-pack-align,
   -misc-const-correctness
 CheckOptions:

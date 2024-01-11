@@ -38,6 +38,7 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 # Setting up dependencies (using CONFIG so find_package doesn't conflict with cmake's own
 # findX.cmake).
 find_package(fmt REQUIRED CONFIG)
+find_package(tinyxml2 REQUIRED CONFIG)
 
 # -------------------------------------
 # Set compiler-specific stuff.
@@ -98,7 +99,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Link libraries.
-target_link_libraries(${PROJECT_NAME} fmt::fmt)
+target_link_libraries(${PROJECT_NAME} fmt::fmt tinyxml2::tinyxml2)
 
 # -------------------------------------
 # End of building executables.
