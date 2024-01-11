@@ -57,8 +57,10 @@ auto main(int argc, char *argv[]) -> int try {
 
     const auto *interfacePtr = protocolPtr->FirstChildElement("interface");
     const char *interfaceName = nullptr;
-    const tinyxml2::XMLElement *interfaceDescPtr = nullptr;
-    const char *interfaceDescText = nullptr;
+    auto interfaceVersion = 1u;
+
+    const tinyxml2::XMLElement *descPtr = nullptr;
+    const char *descText = nullptr;
 
     int interfaceNum = 0;
     while (interfacePtr != nullptr) {
@@ -66,19 +68,23 @@ auto main(int argc, char *argv[]) -> int try {
         interfaceName = interfacePtr->Attribute("name");
         nullptrCheck(interfaceName);
 
-        fmt::print("Interface name ({}): {}.\n", interfaceNum, interfaceName);
+        interfacePtr->QueryUnsignedAttribute("version", &interfaceVersion);
+
+        fmt::print("Interface ({}): {}, version {}.\n", interfaceNum,
+                   interfaceName, interfaceVersion);
 
         // Description.
-        interfaceDescPtr = interfacePtr->FirstChildElement("description");
-        nullptrCheck(interfaceDescPtr);
+        descPtr = interfacePtr->FirstChildElement("description");
+        nullptrCheck(descPtr);
 
-        interfaceDescText = interfaceDescPtr->Attribute("summary");
-        nullptrCheck(interfaceDescText);
-        fmt::print("  Summary: {}.\n", interfaceDescText);
+        descText = descPtr->Attribute("summary");
+        nullptrCheck(descText);
+        fmt::print("  Summary: {}.\n", descText);
 
         // Requests.
         const tinyxml2::XMLElement *requestPtr = nullptr;
         const char *requestName = nullptr;
+        auto requestSince = 1u;
         int requestNum = 0;
 
         requestPtr = interfacePtr->FirstChildElement("request");
@@ -88,7 +94,10 @@ auto main(int argc, char *argv[]) -> int try {
             requestName = requestPtr->Attribute("name");
             nullptrCheck(requestName);
 
-            fmt::print("    Request ({}): {}.\n", requestNum, requestName);
+            requestPtr->QueryUnsignedAttribute("since", &requestSince);
+
+            fmt::print("    Request ({}): {}, since {}.\n", requestNum,
+                       requestName, requestSince);
 
             requestPtr = requestPtr->NextSiblingElement("request");
             ++requestNum;
@@ -97,6 +106,7 @@ auto main(int argc, char *argv[]) -> int try {
         // Events.
         const tinyxml2::XMLElement *eventPtr = nullptr;
         const char *eventName = nullptr;
+        auto eventSince = 1u;
         int eventNum = 0;
 
         eventPtr = interfacePtr->FirstChildElement("event");
@@ -106,7 +116,10 @@ auto main(int argc, char *argv[]) -> int try {
             eventName = eventPtr->Attribute("name");
             nullptrCheck(eventName);
 
-            fmt::print("    Event ({}): {}.\n", eventNum, eventName);
+            eventPtr->QueryUnsignedAttribute("since", &eventSince);
+
+            fmt::print("    Event ({}): {}, since {}.\n", eventNum, eventName,
+                       eventSince);
 
             eventPtr = eventPtr->NextSiblingElement("event");
             ++eventNum;
