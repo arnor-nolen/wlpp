@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  
+env:
+  BUILD_TYPE: Debug
+  CMAKE_PRESET: debug
+
+jobs:
+  ubuntu-22:
+    env:
+      CONAN_PROFILE: ubuntu-22
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Setup Conan
+      uses: turtlebrowser/get-conan@v1.2
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v3
+      
+    - name: Build in one command
+      run: conan build . -s build_type=${{env.BUILD_TYPE}} --build=missing -pr:b=profiles/${{env.CONAN_PROFILE}} -pr:h=profiles/${{env.CONAN_PROFILE}}
+
+    - name: Build with CMake workflow
+      run: cmake --workflow --preset ${{env.CMAKE_PRESET}}
+
+  windows-22:
+    env:
+      CONAN_PROFILE: windows-22
+
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Setup Conan
+      uses: turtlebrowser/get-conan@v1.2
+
+    - name: Build in one command
+      run: conan build . -s build_type=${{env.BUILD_TYPE}} --build=missing -pr:b=profiles/${{env.CONAN_PROFILE}} -pr:h=profiles/${{env.CONAN_PROFILE}}
+
+    - name: Build with CMake workflow
+      run: cmake --workflow --preset multi-${{env.CMAKE_PRESET}}

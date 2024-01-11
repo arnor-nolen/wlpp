@@ -1,0 +1,6 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+CommentPragmas:  '^ NOLINT'
+AlwaysBreakTemplateDeclarations: Yes
+BreakAfterAttributes: Always

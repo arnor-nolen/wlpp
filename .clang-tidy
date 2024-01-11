@@ -1,0 +1,62 @@
+---
+Checks: >
+  *,
+  -fuchsia-*,
+  -google-readability-todo,
+  -google-runtime-references,
+  -llvmlibc-*,
+  -altera-unroll-loops,
+  -readability-uppercase-literal-suffix,
+  -hicpp-uppercase-literal-suffix,
+
+  -altera-id-dependent-backward-branch,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -altera-struct-pack-align,
+  -misc-const-correctness
+CheckOptions:
+  - key: readability-identifier-naming.TypedefCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.VariableCase
+    value: camelBack
+  - key: readability-identifier-naming.ParameterCase
+    value: camelBack
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: camelBack
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: s_
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: camelBack
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: s_
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: camelBack
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: m_
+  - key: readability-identifier-naming.StaticConstantCase
+    value: camelBack
+  - key: readability-identifier-naming.StaticConstantPrefix
+    value: s_
+  - key: readability-identifier-naming.StaticVariableCase
+    value: camelBack
+  - key: readability-identifier-naming.StaticVariablePrefix
+    value: s_
+  - key: readability-identifier-naming.AbstractClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.AbstractClassPrefix
+    value: Abstract
+  - key: misc-assert-side-effect.CheckFunctionCalls
+    value: 1
+  - key: misc-assert-side-effect.AssertMacros
+    value: "assert"
+WarningsAsErrors: ""
+HeaderFilterRegex: ".*"
+FormatStyle: none
