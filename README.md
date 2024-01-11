@@ -1,5 +1,5 @@
-# cpp-template
-C++ template project.
+# wlpp
+C++ Wayland scanner alternative.
 
 ## Dependencies
 Dependencies are listed in [conanfile.py](./conanfile.py).
@@ -19,5 +19,5 @@ Check contents of [CMakePresets.json](./CMakePresets.json) for more info.
 
 ## How to run
 ```sh
-./build/Debug/bin/cpp-template
+./build/Debug/bin/wlpp
 ```

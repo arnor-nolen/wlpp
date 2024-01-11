@@ -2,16 +2,16 @@ from conan import ConanFile
 from conan.tools.cmake import cmake_layout, CMake, CMakeDeps, CMakeToolchain
 
 
-class CppTemplate(ConanFile):
-    name = "CppTemplate"
+class Wlpp(ConanFile):
+    name = "wlpp"
     version = "1.0"
     package_type = "application"
 
     license = "MIT"
     author = ""
     url = ""
-    description = "C++ template."
-    topics = ("C++", "Conan", "Template")
+    description = "C++ Wayland scanner."
+    topics = ("C++", "Conan", "Wayland", "Scanner")
 
     settings = "os", "compiler", "build_type", "arch"
     exports_sources = "CMakeLists.txt", "src/*"
