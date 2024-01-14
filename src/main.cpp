@@ -7,7 +7,7 @@
 #include <protocol.hpp>
 #include <util.hpp>
 
-auto main(int argc, char *argv[]) -> int try {
+auto main(int argc, char *argv[]) -> int {
 
     auto args = std::span{argv, static_cast<size_t>(argc)};
 
@@ -42,8 +42,4 @@ auto main(int argc, char *argv[]) -> int try {
     fmt::print("{}\n", protocol);
 
     return EXIT_SUCCESS;
-} catch (const std::exception &e) {
-    fmt::print("Exception: {}\n", e.what());
-
-    return EXIT_FAILURE;
 }
