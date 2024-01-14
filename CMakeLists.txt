@@ -76,7 +76,9 @@ endif()
 # -------------------------------------
 
 # Build the main app.
-set(SOURCE_FILES "src/main.cpp")
+set(SOURCE_FILES "src/main.cpp" "src/protocol.cpp" "src/util.cpp" "src/interface.cpp"
+                 "src/request.cpp" "src/event.cpp"
+)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
