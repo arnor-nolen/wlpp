@@ -1,9 +1,15 @@
 #include <util.hpp>
 
-#include <stdexcept>
+#include <fmt/core.h>
 
 void nullptrCheck(const void *ptr) {
     if (ptr == nullptr) {
-        throw std::runtime_error("Error parsing file.");
+        halt("Error parsing file.");
     }
+}
+
+[[noreturn]]
+void halt(std::string_view message) {
+    fmt::print("{}\n", message);
+    std::terminate();
 }
