@@ -9,6 +9,8 @@ namespace tinyxml2 {
 class XMLElement;
 } // namespace tinyxml2
 
+class GeneratorHeader;
+
 class Event {
   public:
     explicit Event(const tinyxml2::XMLElement *xmlElement) noexcept;
@@ -20,6 +22,7 @@ class Event {
     // args
 
     friend fmt::formatter<Event>;
+    friend GeneratorHeader;
 };
 
 template <>

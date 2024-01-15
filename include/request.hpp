@@ -9,6 +9,8 @@ namespace tinyxml2 {
 class XMLElement;
 } // namespace tinyxml2
 
+class GeneratorHeader;
+
 enum class RequestType { Normal, Destructor };
 
 auto strToRequestType(std::string_view typeStr) -> RequestType;
@@ -26,6 +28,7 @@ class Request {
     // args
 
     friend fmt::formatter<Request>;
+    friend GeneratorHeader;
 };
 
 template <>

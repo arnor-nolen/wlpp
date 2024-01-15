@@ -6,15 +6,22 @@
 
 #include <fmt/core.h>
 
+#include <generator.hpp>
 #include <interface.hpp>
 
 namespace tinyxml2 {
 class XMLElement;
 } // namespace tinyxml2
 
+class GeneratorHeader;
+
 class Protocol {
   public:
     explicit Protocol(const tinyxml2::XMLElement *xmlElement) noexcept;
+
+    void generate(const Generator auto &generator) const noexcept {
+        generator.dump(*this);
+    }
 
   private:
     std::string m_name{};
@@ -22,6 +29,7 @@ class Protocol {
     std::vector<Interface> m_interfaces{};
 
     friend fmt::formatter<Protocol>;
+    friend GeneratorHeader;
 };
 
 template <>

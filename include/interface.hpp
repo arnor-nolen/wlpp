@@ -13,6 +13,8 @@ namespace tinyxml2 {
 class XMLElement;
 } // namespace tinyxml2
 
+class GeneratorHeader;
+
 class Interface {
   public:
     explicit Interface(const tinyxml2::XMLElement *xmlElement) noexcept;
@@ -25,6 +27,7 @@ class Interface {
     std::vector<Event> m_events{};
 
     friend fmt::formatter<Interface>;
+    friend GeneratorHeader;
 };
 
 template <>
