@@ -44,4 +44,12 @@ Request::Request(const tinyxml2::XMLElement *xmlElement) noexcept {
     const char *descText = descPtr->Attribute("summary");
     nullptrCheck(descText);
     m_description = descText;
+
+    // Args.
+    const tinyxml2::XMLElement *argPtr = xmlElement->FirstChildElement("arg");
+
+    while (argPtr != nullptr) {
+        m_args.emplace_back(argPtr);
+        argPtr = argPtr->NextSiblingElement("arg");
+    }
 }

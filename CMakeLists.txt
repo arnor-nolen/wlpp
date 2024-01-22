@@ -84,6 +84,7 @@ set(SOURCE_FILES
     "src/request.cpp"
     "src/event.cpp"
     "src/generator_header.cpp"
+    "src/arg.cpp"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

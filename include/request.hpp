@@ -2,8 +2,11 @@
 #define REQUEST_HPP
 
 #include <string>
+#include <vector>
 
 #include <fmt/core.h>
+
+#include <arg.hpp>
 
 namespace tinyxml2 {
 class XMLElement;
@@ -25,7 +28,7 @@ class Request {
     unsigned int m_since{1};
     std::string m_description{};
     RequestType m_type{RequestType::Normal};
-    // args
+    std::vector<Arg> m_args{};
 
     friend fmt::formatter<Request>;
     friend GeneratorHeader;
@@ -53,10 +56,21 @@ class fmt::formatter<Request> {
 
     template <typename Context>
     static constexpr auto format(const Request &request, Context &ctx) {
-        return fmt::format_to(
-            ctx.out(), "    Request: {}, since: {}, type: {}, description: {}.",
+        auto it = fmt::format_to(
+            ctx.out(),
+            "    Request: {}, since: {}, type: {}, description: {}.\n",
             request.m_name, request.m_since, request.m_type,
             request.m_description);
+
+        if (!request.m_args.empty()) {
+            it = fmt::format_to(it, "        Args ({}):\n",
+                                request.m_args.size());
+        }
+        for (const auto &arg : request.m_args) {
+            it = fmt::format_to(it, "    {}\n", arg);
+        }
+
+        return it;
     }
 };
 #endif
