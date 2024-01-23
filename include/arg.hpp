@@ -31,11 +31,11 @@ class Arg {
 
   private:
     std::string m_name{};
-    std::optional<std::string> m_summary{};
     ArgType m_type;
-    // unsigned int m_interface{};
+    std::optional<std::string> m_summary{};
+    std::optional<std::string> m_interface{};
+    bool m_allowNull{false};
     // unsigned int m_enum{};
-    // unsigned int m_allowNull{};
 
     friend fmt::formatter<Arg>;
     friend GeneratorHeader;
@@ -69,6 +69,12 @@ class fmt::formatter<Arg> {
         if (arg.m_summary) {
             it = fmt::format_to(it, ", summary: {}", *arg.m_summary);
         }
+
+        if (arg.m_interface) {
+            it = fmt::format_to(it, ", interface: {}", *arg.m_interface);
+        }
+
+        it = fmt::format_to(it, ", allowNull: {}", arg.m_allowNull);
 
         it = fmt::format_to(it, ".");
 

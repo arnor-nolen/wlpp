@@ -83,4 +83,11 @@ Arg::Arg(const tinyxml2::XMLElement *xmlElement) noexcept {
     if (argSummary != nullptr) {
         m_summary = argSummary;
     }
+
+    const char *argInterface = xmlElement->Attribute("interface");
+    if (argInterface != nullptr) {
+        m_interface = argInterface;
+    }
+
+    xmlElement->QueryBoolAttribute("allow-null", &m_allowNull);
 }
