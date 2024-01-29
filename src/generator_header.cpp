@@ -14,19 +14,27 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
     auto capitalizedName = protocol.m_name;
     std::transform(capitalizedName.begin(), capitalizedName.end(),
                    capitalizedName.begin(), toupper);
-    fmt::print("#ifndef {}_CLIENT_PROTOCOL_H\n#define {}_CLIENT_PROTOCOL_H\n\n",
-               capitalizedName, capitalizedName);
+    fmt::print(
+        "#ifndef {}_CLIENT_PROTOCOL_HPP\n#define {}_CLIENT_PROTOCOL_HPP\n\n",
+        capitalizedName, capitalizedName);
 
     fmt::print("#include <string>\n#include <memory>\n\n");
+    fmt::print("#include <wayland-client-core.h>\n\n");
 
     fmt::print("/*{}\n*/\n\n", protocol.m_copyright);
+
+    for (const auto &interface : protocol.m_interfaces) {
+        fmt::print("class {};\n", snakeToPascal(interface.m_name));
+    }
+
+    fmt::print("\n");
 
     for (const auto &interface : protocol.m_interfaces) {
         const auto interfaceNamePascal = snakeToPascal(interface.m_name);
 
         fmt::print("class {} {{\n  public:\n", interfaceNamePascal);
-        fmt::print("    explicit {}({} *nativeHandle) noexcept;\n",
-                   interfaceNamePascal, interface.m_name);
+        fmt::print("    explicit {}(wl_proxy *nativeHandle) noexcept;\n",
+                   interfaceNamePascal);
         // fmt::print("    ~{}();\n\n", interfaceNamePascal);
         //
         // fmt::print("    {}(const {} &) = delete;\n", interfaceNamePascal,
@@ -59,7 +67,10 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
 
             for (size_t i = 0u; i < request.m_args.size(); ++i) {
                 const auto &arg = request.m_args[i];
-                const auto argNameCamel = snakeToCamel(arg.m_name);
+                auto argNameCamel = snakeToCamel(arg.m_name);
+                if (argNameCamel == "class") {
+                    argNameCamel = "clazz";
+                }
 
                 if (arg.m_type == ArgType::NewId) {
                     continue;
@@ -73,7 +84,7 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                     // TODO: Check if null is allowed. If not, use
                     // references.
                     assert(arg.m_interface);
-                    fmt::print("{} *{}", snakeToCamel(*arg.m_interface),
+                    fmt::print("{} *{}", snakeToPascal(*arg.m_interface),
                                argNameCamel);
                 } else {
                     fmt::print("{} {}", argTypeToCppType(arg.m_type),
@@ -94,11 +105,11 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
             }
         }
 
-        fmt::print("\n    auto getNativeHandle() const noexcept -> {} *;\n",
-                   interface.m_name);
+        fmt::print("\n    [[nodiscard]]\n    auto getNativeHandle() const "
+                   "noexcept -> wl_proxy *;\n");
 
-        fmt::print("\n  private:\n    std::unique_ptr<{}> m_nativeHandle;\n",
-                   interface.m_name);
+        fmt::print(
+            "\n  private:\n    std::unique_ptr<wl_proxy> m_nativeHandle;\n");
         fmt::print("}};\n\n");
     };
 

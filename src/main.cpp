@@ -34,16 +34,16 @@ auto main(int argc, char *argv[]) -> int {
         return EXIT_FAILURE;
     }
 
-    fmt::print("Loaded file: {}.\n", args[1]);
+    // fmt::print("Loaded file: {}.\n", args[1]);
 
     const auto *protocolPtr = doc.FirstChildElement("protocol");
     nullptrCheck(protocolPtr);
 
     const auto protocol = Protocol{protocolPtr};
-    fmt::print("{}\n", protocol);
+    // fmt::print("{}\n", protocol);
 
     const auto headerGen = GeneratorHeader{};
-    fmt::print("Generated file:\n\n");
+    // fmt::print("Generated file:\n\n");
     protocol.generate(headerGen);
 
     return EXIT_SUCCESS;
