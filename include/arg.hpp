@@ -11,6 +11,7 @@ class XMLElement;
 } // namespace tinyxml2
 
 class GeneratorHeader;
+class GeneratorCode;
 
 enum class ArgType {
     UnsignedInt,
@@ -39,6 +40,7 @@ class Arg {
 
     friend fmt::formatter<Arg>;
     friend GeneratorHeader;
+    friend GeneratorCode;
 };
 
 template <>

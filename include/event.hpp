@@ -10,6 +10,7 @@ class XMLElement;
 } // namespace tinyxml2
 
 class GeneratorHeader;
+class GeneratorCode;
 
 class Event {
   public:
@@ -23,6 +24,7 @@ class Event {
 
     friend fmt::formatter<Event>;
     friend GeneratorHeader;
+    friend GeneratorCode;
 };
 
 template <>

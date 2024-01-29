@@ -4,6 +4,7 @@
 #include <span>
 #include <tinyxml2.h>
 
+#include <generator_code.hpp>
 #include <generator_header.hpp>
 #include <protocol.hpp>
 #include <util.hpp>
@@ -43,8 +44,11 @@ auto main(int argc, char *argv[]) -> int {
     // fmt::print("{}\n", protocol);
 
     const auto headerGen = GeneratorHeader{};
+    const auto codeGen = GeneratorCode{};
     // fmt::print("Generated file:\n\n");
-    protocol.generate(headerGen);
+
+    // protocol.generate(headerGen);
+    protocol.generate(codeGen);
 
     return EXIT_SUCCESS;
 }

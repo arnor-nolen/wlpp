@@ -14,6 +14,7 @@ class XMLElement;
 } // namespace tinyxml2
 
 class GeneratorHeader;
+class GeneratorCode;
 
 class Interface {
   public:
@@ -28,6 +29,7 @@ class Interface {
 
     friend fmt::formatter<Interface>;
     friend GeneratorHeader;
+    friend GeneratorCode;
 };
 
 template <>

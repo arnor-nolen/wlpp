@@ -13,6 +13,7 @@ class XMLElement;
 } // namespace tinyxml2
 
 class GeneratorHeader;
+class GeneratorCode;
 
 enum class RequestType { Normal, Destructor };
 
@@ -32,6 +33,7 @@ class Request {
 
     friend fmt::formatter<Request>;
     friend GeneratorHeader;
+    friend GeneratorCode;
 };
 
 template <>
