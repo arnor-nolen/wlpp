@@ -25,11 +25,12 @@ void GeneratorCode::dump(const Protocol &protocol) noexcept {
     for (const auto &interface : protocol.m_interfaces) {
         const auto interfaceNamePascal = snakeToPascal(interface.m_name);
 
-        fmt::print("{}::{}(wl_proxy *nativeHandle) noexcept : \n"
-                   "    m_nativeHandle{{ nativeHandle }} {{}}\n\n",
+        fmt::print("{}::{}(wl_proxy *nativeHandle) noexcept\n"
+                   "    : m_nativeHandle{{nativeHandle}} {{}}\n\n",
                    interfaceNamePascal, interfaceNamePascal);
 
-        for (const auto &request : interface.m_requests) {
+        for (size_t j = 0u; j < interface.m_requests.size(); ++j) {
+            const auto &request = interface.m_requests[j];
             const auto requestNameCamel = snakeToCamel(request.m_name);
 
             const auto newIdIt =
@@ -46,7 +47,7 @@ void GeneratorCode::dump(const Protocol &protocol) noexcept {
                 const auto &arg = request.m_args[i];
                 auto argNameCamel = snakeToCamel(arg.m_name);
                 if (argNameCamel == "class") {
-                    argNameCamel = "clazz";
+                    argNameCamel = "className";
                 }
 
                 if (arg.m_type == ArgType::NewId) {
@@ -71,8 +72,37 @@ void GeneratorCode::dump(const Protocol &protocol) noexcept {
 
             if (hasNewId) {
                 if (newIdIt->m_interface) {
-                    fmt::print(") const noexcept -> {} * {{}}\n\n",
+                    fmt::print(R"() const noexcept -> {} {{
+	auto* object = wl_proxy_marshal_flags(m_nativeHandle.get(),
+			 {}, &s_nativeInterface, wl_proxy_get_version(m_nativeHandle.get()), 0, nullptr)",
+                               snakeToPascal(*newIdIt->m_interface), j);
+
+                    for (const auto &arg : request.m_args) {
+                        if (arg.m_type == ArgType::NewId) {
+                            continue;
+                        }
+
+                        auto argNameCamel = snakeToCamel(arg.m_name);
+                        if (argNameCamel == "class") {
+                            argNameCamel = "className";
+                        }
+
+                        auto argTypeStr = argTypeToCppType(arg.m_type);
+                        if (argTypeStr == "std::string") {
+                            fmt::print(", {}.c_str()", argNameCamel);
+                        } else {
+                            fmt::print(", {}", argNameCamel);
+                        }
+                    }
+
+                    fmt::print(R"();
+
+	return {}{{object}};
+}}
+
+)",
                                snakeToPascal(*newIdIt->m_interface));
+
                 } else {
                     // Wayland protocol wl_registry.bind() is an
                     // exception.
@@ -81,12 +111,14 @@ void GeneratorCode::dump(const Protocol &protocol) noexcept {
             } else {
                 fmt::print(
                     R"() const noexcept {{
-    wl_proxy_marshal_flags( m_nativeHandle.get(), /* TODO: Add correct enum. */0, 
-        nullptr, wl_proxy_get_version(m_nativeHandle.get()), 0)");
+    wl_proxy_marshal_flags(m_nativeHandle.get(), {}, 
+        nullptr, wl_proxy_get_version(m_nativeHandle.get()), 0)",
+                    j);
+
                 for (const auto &arg : request.m_args) {
                     auto argNameCamel = snakeToCamel(arg.m_name);
                     if (argNameCamel == "class") {
-                        argNameCamel = "clazz";
+                        argNameCamel = "className";
                     }
 
                     auto argTypeStr = argTypeToCppType(arg.m_type);

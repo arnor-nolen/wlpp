@@ -69,7 +69,7 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                 const auto &arg = request.m_args[i];
                 auto argNameCamel = snakeToCamel(arg.m_name);
                 if (argNameCamel == "class") {
-                    argNameCamel = "clazz";
+                    argNameCamel = "className";
                 }
 
                 if (arg.m_type == ArgType::NewId) {
@@ -94,7 +94,7 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
 
             if (hasNewId) {
                 if (newIdIt->m_interface) {
-                    fmt::print(") const noexcept -> {} *;\n",
+                    fmt::print(") const noexcept -> {};\n",
                                snakeToPascal(*newIdIt->m_interface));
                 } else {
                     // Wayland protocol wl_registry.bind() is an exception.
@@ -108,8 +108,14 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
         fmt::print("\n    [[nodiscard]]\n    auto getNativeHandle() const "
                    "noexcept -> wl_proxy *;\n");
 
-        fmt::print(
-            "\n  private:\n    std::unique_ptr<wl_proxy> m_nativeHandle;\n");
+        fmt::print(R"(
+    constexpr static wl_interface s_nativeInterface = {{
+        "{}", {}, {}, nullptr, {}, nullptr,
+    }};)",
+                   interface.m_name, interface.m_version,
+                   interface.m_requests.size(), interface.m_events.size());
+        fmt::print("\n  private:\n    std::unique_ptr<wl_proxy> "
+                   "m_nativeHandle;\n");
         fmt::print("}};\n\n");
     };
 
