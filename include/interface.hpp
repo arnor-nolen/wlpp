@@ -5,13 +5,10 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <tinyxml2.h>
 
 #include <event.hpp>
 #include <request.hpp>
-
-namespace tinyxml2 {
-class XMLElement;
-} // namespace tinyxml2
 
 class GeneratorHeader;
 class GeneratorCode;

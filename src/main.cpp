@@ -6,6 +6,7 @@
 
 #include <generator_code.hpp>
 #include <generator_header.hpp>
+#include <generator_mode.hpp>
 #include <protocol.hpp>
 #include <util.hpp>
 
@@ -14,18 +15,23 @@ auto main(int argc, char *argv[]) -> int {
     auto args = std::span{argv, static_cast<size_t>(argc)};
 
     if (args.empty()) {
-        fmt::print("Usage: <program_name> <xml_file>.\n");
+        fmt::print("Usage: <program_name> <xml_file> <generator_mode>.\n");
         return EXIT_FAILURE;
     }
 
-    if (args.size() > 2) {
-        fmt::print("Usage: {} <xml_file>.\n", args[0]);
+    if (args.size() > 3) {
+        fmt::print("Usage: {} <xml_file> <generator_mode>.\n", args[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (args.size() == 2) {
+        fmt::print("Usage: {} <xml_file> <generator_mode>.\n", args[0]);
         return EXIT_FAILURE;
     }
 
     if (args.size() == 1) {
         fmt::print("wlpp version: 1.0.0.\n");
-        fmt::print("Usage: {} <xml_file>.\n", args[0]);
+        fmt::print("Usage: {} <xml_file> <generator_mode>.\n", args[0]);
         return EXIT_FAILURE;
     }
 
@@ -35,20 +41,28 @@ auto main(int argc, char *argv[]) -> int {
         return EXIT_FAILURE;
     }
 
-    // fmt::print("Loaded file: {}.\n", args[1]);
-
     const auto *protocolPtr = doc.FirstChildElement("protocol");
     nullptrCheck(protocolPtr);
 
     const auto protocol = Protocol{protocolPtr};
-    // fmt::print("{}\n", protocol);
 
-    const auto headerGen = GeneratorHeader{};
-    const auto codeGen = GeneratorCode{};
-    // fmt::print("Generated file:\n\n");
+    const auto genMode = strToGeneratorMode(args[2]);
 
-    // protocol.generate(headerGen);
-    protocol.generate(codeGen);
+    switch (genMode) {
+    case GeneratorMode::Debug: {
+        fmt::print("{}\n", protocol);
+    } break;
+    case GeneratorMode::Header: {
+        const auto headerGen = GeneratorHeader{};
+        protocol.generate(headerGen);
+    } break;
+    case GeneratorMode::Code: {
+        const auto codeGen = GeneratorCode{};
+        protocol.generate(codeGen);
+    } break;
+    default:
+        halt("Unknown generator mode.");
+    }
 
     return EXIT_SUCCESS;
 }

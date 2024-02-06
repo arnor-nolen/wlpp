@@ -4,10 +4,7 @@
 #include <string>
 
 #include <fmt/core.h>
-
-namespace tinyxml2 {
-class XMLElement;
-} // namespace tinyxml2
+#include <tinyxml2.h>
 
 class GeneratorHeader;
 class GeneratorCode;
