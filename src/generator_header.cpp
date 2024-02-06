@@ -18,7 +18,7 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
         "#ifndef {}_CLIENT_PROTOCOL_HPP\n#define {}_CLIENT_PROTOCOL_HPP\n\n",
         capitalizedName, capitalizedName);
 
-    fmt::print("#include <string>\n#include <memory>\n\n");
+    fmt::print("#include <array>\n#include <memory>\n#include <string>\n\n");
     fmt::print("#include <wayland-client-core.h>\n\n");
 
     fmt::print("/*{}\n*/\n\n", protocol.m_copyright);
@@ -61,6 +61,10 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                 });
 
             const auto hasNewId = newIdIt != request.m_args.end();
+
+            if (hasNewId) {
+                fmt::print("    [[nodiscard]]\n");
+            }
 
             fmt::print("    {} {}(", hasNewId ? "auto" : "void",
                        requestNameCamel);
@@ -109,11 +113,33 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                    "noexcept -> wl_proxy *;\n");
 
         fmt::print(R"(
+    constexpr static std::array<wl_message, {}> s_nativeRequests = {{{{)",
+                   interface.m_requests.size());
+        for (const auto &request : interface.m_requests) {
+            fmt::print(R"(
+        {{"{}", "", nullptr}},)",
+                       request.m_name);
+        }
+        fmt::print(R"(
+    }}}};)");
+
+        fmt::print(R"(
+    constexpr static std::array<wl_message, {}> s_nativeEvents = {{{{)",
+                   interface.m_events.size());
+        for (const auto &event : interface.m_events) {
+            fmt::print(R"(
+        {{"{}", "", nullptr}},)",
+                       event.m_name);
+        }
+        fmt::print(R"(
+    }}}};)");
+
+        fmt::print(R"(
     constexpr static wl_interface s_nativeInterface = {{
-        "{}", {}, {}, nullptr, {}, nullptr,
+        "{}", {}, s_nativeRequests.size(), s_nativeRequests.data(), s_nativeEvents.size(), s_nativeEvents.data(),
     }};)",
-                   interface.m_name, interface.m_version,
-                   interface.m_requests.size(), interface.m_events.size());
+                   interface.m_name, interface.m_version);
+
         fmt::print("\n  private:\n    std::unique_ptr<wl_proxy> "
                    "m_nativeHandle;\n");
         fmt::print("}};\n\n");
