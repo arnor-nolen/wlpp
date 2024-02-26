@@ -106,7 +106,14 @@ void GeneratorCode::dump(const Protocol &protocol) noexcept {
                 } else {
                     // Wayland protocol wl_registry.bind() is an
                     // exception.
-                    fmt::print(") const noexcept -> void * {{}}\n\n");
+                    fmt::print(
+                        R"(, const wl_interface *interface, unsigned int version) const noexcept -> void * {{
+	return wl_proxy_marshal_flags(m_nativeHandle.get(),
+			 {}, &s_nativeInterface, wl_proxy_get_version(m_nativeHandle.get()), 0, name, interface->name, version, nullptr);
+}}
+
+)",
+                        j);
                 }
             } else {
                 fmt::print(

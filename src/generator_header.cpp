@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <numeric>
 #include <ranges>
 
 #include <fmt/format.h>
@@ -121,7 +122,8 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                                snakeToPascal(*newIdIt->m_interface));
                 } else {
                     // Wayland protocol wl_registry.bind() is an exception.
-                    fmt::print(") const noexcept -> void *;\n");
+                    fmt::print(", const wl_interface *interface, unsigned int "
+                               "version) const noexcept -> void *;\n");
                 }
             } else {
                 fmt::print(") const noexcept;\n");
@@ -135,18 +137,44 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
                    interface.m_version);
 
         if (!interface.m_requests.empty()) {
+            const auto totalArgs = std::accumulate(
+                interface.m_requests.cbegin(), interface.m_requests.cend(), 0,
+                [](const auto &lhs, const auto &rhs) {
+                    return lhs + rhs.m_args.size();
+                });
+            fmt::print(R"(
+    constexpr static std::array<wl_interface *, {}u> s_nativeRequestsParamInterfaces = {{{{
+)",
+                       totalArgs);
+            for (const auto &request : interface.m_requests) {
+                for (const auto &arg : request.m_args) {
+                    if (arg.m_type == ArgType::NewId && arg.m_interface) {
+                        fmt::print("        {}::s_nativeInterface,\n",
+                                   snakeToPascal(*arg.m_interface));
+                    } else {
+                        fmt::print("        nullptr,\n");
+                    }
+                }
+            }
+            fmt::print(R"(}}}};)");
+
             fmt::print(R"(
     constexpr static std::array<wl_message, {}u> s_nativeRequests = {{{{)",
                        interface.m_requests.size());
+
+            size_t currentPos = 0u;
             for (const auto &request : interface.m_requests) {
+
                 fmt::print(
                     R"(
-        {{"{}", "{}", nullptr}},)",
+        {{"{}", "{}", const_cast<const wl_interface **>(&s_nativeRequestsParamInterfaces[{}])}},)",
                     request.m_name,
                     interface.m_name == "wl_registry" &&
                             request.m_name == "bind"
                         ? "usun"
-                        : argsToWlArgString(request.m_args, request.m_since));
+                        : argsToWlArgString(request.m_args, request.m_since),
+                    currentPos);
+                currentPos += request.m_args.size();
             }
             fmt::print(R"(
     }}}};)");
