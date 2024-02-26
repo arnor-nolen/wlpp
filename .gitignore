@@ -1,3 +1,7 @@
+# Examples
+example/wayland-client-protocol.hpp
+example/wayland-client-protocol.cpp
+
 # Conan presets
 ConanPresets.json
 
