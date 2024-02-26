@@ -134,35 +134,54 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
         fmt::print("\n    constexpr static auto s_maxInterfaceVersion = {}u;\n",
                    interface.m_version);
 
-        fmt::print(R"(
+        if (!interface.m_requests.empty()) {
+            fmt::print(R"(
     constexpr static std::array<wl_message, {}u> s_nativeRequests = {{{{)",
-                   interface.m_requests.size());
-        for (const auto &request : interface.m_requests) {
-            fmt::print(R"(
+                       interface.m_requests.size());
+            for (const auto &request : interface.m_requests) {
+                fmt::print(
+                    R"(
         {{"{}", "{}", nullptr}},)",
-                       request.m_name,
-                       argsToWlArgString(request.m_args, request.m_since));
-        }
-        fmt::print(R"(
+                    request.m_name,
+                    interface.m_name == "wl_registry" &&
+                            request.m_name == "bind"
+                        ? "usun"
+                        : argsToWlArgString(request.m_args, request.m_since));
+            }
+            fmt::print(R"(
     }}}};)");
+        }
 
-        fmt::print(R"(
+        if (!interface.m_events.empty()) {
+            fmt::print(R"(
     constexpr static std::array<wl_message, {}u> s_nativeEvents = {{{{)",
-                   interface.m_events.size());
-        for (const auto &event : interface.m_events) {
-            fmt::print(R"(
+                       interface.m_events.size());
+            for (const auto &event : interface.m_events) {
+                fmt::print(R"(
         {{"{}", "{}", nullptr}},)",
-                       event.m_name,
-                       argsToWlArgString(event.m_args, event.m_since));
-        }
-        fmt::print(R"(
+                           event.m_name,
+                           argsToWlArgString(event.m_args, event.m_since));
+            }
+            fmt::print(R"(
     }}}};)");
+        }
 
-        fmt::print(R"(
+        fmt::print(
+            R"(
     constexpr static wl_interface s_nativeInterface = {{
-        "{}", s_maxInterfaceVersion, s_nativeRequests.size(), s_nativeRequests.data(), s_nativeEvents.size(), s_nativeEvents.data(),
+        "{}",
+        s_maxInterfaceVersion,
+        {},
+        {},
+        {},
+        {},
     }};)",
-                   interface.m_name);
+            interface.m_name,
+            interface.m_requests.empty() ? "0" : "s_nativeRequests.size()",
+            interface.m_requests.empty() ? "nullptr"
+                                         : "s_nativeRequests.data()",
+            interface.m_events.empty() ? "0" : "s_nativeEvents.size()",
+            interface.m_events.empty() ? "nullptr" : "s_nativeEvents.data()");
 
         fmt::print("\n\n  private:\n    std::unique_ptr<wl_proxy> "
                    "m_nativeHandle;\n");
