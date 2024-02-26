@@ -1,8 +1,8 @@
-#include <protocol.hpp>
+#include <wlpp/protocol.hpp>
 
 #include <tinyxml2.h>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 Protocol::Protocol(const tinyxml2::XMLElement *xmlElement) noexcept {
     const char *protocolName = xmlElement->Attribute("name");

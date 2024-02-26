@@ -4,11 +4,11 @@
 #include <span>
 #include <tinyxml2.h>
 
-#include <generator_code.hpp>
-#include <generator_header.hpp>
-#include <generator_mode.hpp>
-#include <protocol.hpp>
-#include <util.hpp>
+#include <wlpp/generator_code.hpp>
+#include <wlpp/generator_header.hpp>
+#include <wlpp/generator_mode.hpp>
+#include <wlpp/protocol.hpp>
+#include <wlpp/util.hpp>
 
 auto main(int argc, char *argv[]) -> int {
 

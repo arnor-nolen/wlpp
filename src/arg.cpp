@@ -1,8 +1,8 @@
-#include <arg.hpp>
+#include <wlpp/arg.hpp>
 
 #include <tinyxml2.h>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 auto strToArgType(std::string_view typeStr) -> ArgType {
     if (typeStr == "uint") {
@@ -29,6 +29,14 @@ auto strToArgType(std::string_view typeStr) -> ArgType {
         return ArgType::Object;
     }
 
+    if (typeStr == "fixed") {
+        return ArgType::Fixed;
+    }
+
+    if (typeStr == "array") {
+        return ArgType::Array;
+    }
+
     halt("Unknown arg type.");
 }
 
@@ -46,6 +54,10 @@ auto argTypeToStr(ArgType argType) -> std::string {
         return "string";
     case ArgType::Object:
         return "object";
+    case ArgType::Fixed:
+        return "double";
+    case ArgType::Array:
+        return "array";
     default:
         halt("Unknown ArgType.");
     }
@@ -65,6 +77,33 @@ auto argTypeToCppType(ArgType argType) -> std::string {
         return "std::string";
     case ArgType::Object:
         return "object";
+    case ArgType::Fixed:
+        return "double";
+    case ArgType::Array:
+        return "array";
+    default:
+        halt("Unknown ArgType.");
+    }
+}
+
+auto argTypeToChar(ArgType argType) -> char {
+    switch (argType) {
+    case ArgType::UnsignedInt:
+        return 'u';
+    case ArgType::Int:
+        return 'i';
+    case ArgType::NewId:
+        return 'n';
+    case ArgType::FileDescriptor:
+        return 'h';
+    case ArgType::String:
+        return 's';
+    case ArgType::Object:
+        return 'o';
+    case ArgType::Fixed:
+        return 'f';
+    case ArgType::Array:
+        return 'a';
     default:
         halt("Unknown ArgType.");
     }
@@ -90,4 +129,16 @@ Arg::Arg(const tinyxml2::XMLElement *xmlElement) noexcept {
     }
 
     xmlElement->QueryBoolAttribute("allow-null", &m_allowNull);
+}
+
+auto Arg::toWlString() const noexcept -> std::string {
+    auto str = std::string{};
+
+    if (m_allowNull) {
+        str.push_back('?');
+    }
+
+    str.push_back(argTypeToChar(m_type));
+
+    return str;
 }

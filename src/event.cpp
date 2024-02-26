@@ -1,8 +1,8 @@
-#include <event.hpp>
+#include <wlpp/event.hpp>
 
 #include <tinyxml2.h>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 Event::Event(const tinyxml2::XMLElement *xmlElement) noexcept {
     const char *eventName = xmlElement->Attribute("name");
@@ -18,4 +18,12 @@ Event::Event(const tinyxml2::XMLElement *xmlElement) noexcept {
     const char *descText = descPtr->Attribute("summary");
     nullptrCheck(descText);
     m_description = descText;
+
+    // Args.
+    const tinyxml2::XMLElement *argPtr = xmlElement->FirstChildElement("arg");
+
+    while (argPtr != nullptr) {
+        m_args.emplace_back(argPtr);
+        argPtr = argPtr->NextSiblingElement("arg");
+    }
 }

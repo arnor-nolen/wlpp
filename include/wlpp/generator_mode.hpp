@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 enum class GeneratorMode {
     Debug,

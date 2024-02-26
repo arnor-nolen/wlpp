@@ -17,15 +17,21 @@ enum class ArgType {
     FileDescriptor,
     String,
     Object,
+    Fixed,
+    Array,
 };
 
 auto strToArgType(std::string_view typeStr) -> ArgType;
 auto argTypeToStr(ArgType argType) -> std::string;
 auto argTypeToCppType(ArgType argType) -> std::string;
+auto argTypeToChar(ArgType argType) -> char;
 
 class Arg {
   public:
     explicit Arg(const tinyxml2::XMLElement *xmlElement) noexcept;
+
+    [[nodiscard]]
+    auto toWlString() const noexcept -> std::string;
 
   private:
     std::string m_name{};

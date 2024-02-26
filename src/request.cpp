@@ -1,10 +1,10 @@
-#include <request.hpp>
+#include <wlpp/request.hpp>
 
 #include <string_view>
 
 #include <tinyxml2.h>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 auto strToRequestType(std::string_view typeStr) -> RequestType {
     if (typeStr == "destructor") {

@@ -7,8 +7,8 @@
 #include <fmt/core.h>
 #include <tinyxml2.h>
 
-#include <event.hpp>
-#include <request.hpp>
+#include <wlpp/event.hpp>
+#include <wlpp/request.hpp>
 
 class GeneratorHeader;
 class GeneratorCode;

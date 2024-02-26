@@ -1,4 +1,4 @@
-#include <generator_code.hpp>
+#include <wlpp/generator_code.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -7,8 +7,8 @@
 
 #include <fmt/format.h>
 
-#include <protocol.hpp>
-#include <util.hpp>
+#include <wlpp/protocol.hpp>
+#include <wlpp/util.hpp>
 
 void GeneratorCode::dump(const Protocol &protocol) noexcept {
     auto capitalizedName = protocol.m_name;

@@ -1,4 +1,4 @@
-#include <generator_header.hpp>
+#include <wlpp/generator_header.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -7,8 +7,27 @@
 
 #include <fmt/format.h>
 
-#include <protocol.hpp>
-#include <util.hpp>
+#include <wlpp/protocol.hpp>
+#include <wlpp/util.hpp>
+
+namespace {
+
+auto argsToWlArgString(std::ranges::input_range auto range,
+                       unsigned int sinceVersion) -> std::string {
+    auto wlArgString = std::string{};
+
+    if (sinceVersion > 1) {
+        wlArgString.append(std::to_string(sinceVersion));
+    }
+
+    for (const auto &elem : range) {
+        wlArgString.append(elem.toWlString());
+    }
+
+    return wlArgString;
+}
+
+} // namespace
 
 void GeneratorHeader::dump(const Protocol &protocol) noexcept {
     auto capitalizedName = protocol.m_name;
@@ -112,35 +131,40 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
         fmt::print("\n    [[nodiscard]]\n    auto getNativeHandle() const "
                    "noexcept -> wl_proxy *;\n");
 
+        fmt::print("\n    constexpr static auto s_maxInterfaceVersion = {}u;\n",
+                   interface.m_version);
+
         fmt::print(R"(
-    constexpr static std::array<wl_message, {}> s_nativeRequests = {{{{)",
+    constexpr static std::array<wl_message, {}u> s_nativeRequests = {{{{)",
                    interface.m_requests.size());
         for (const auto &request : interface.m_requests) {
             fmt::print(R"(
-        {{"{}", "", nullptr}},)",
-                       request.m_name);
+        {{"{}", "{}", nullptr}},)",
+                       request.m_name,
+                       argsToWlArgString(request.m_args, request.m_since));
         }
         fmt::print(R"(
     }}}};)");
 
         fmt::print(R"(
-    constexpr static std::array<wl_message, {}> s_nativeEvents = {{{{)",
+    constexpr static std::array<wl_message, {}u> s_nativeEvents = {{{{)",
                    interface.m_events.size());
         for (const auto &event : interface.m_events) {
             fmt::print(R"(
-        {{"{}", "", nullptr}},)",
-                       event.m_name);
+        {{"{}", "{}", nullptr}},)",
+                       event.m_name,
+                       argsToWlArgString(event.m_args, event.m_since));
         }
         fmt::print(R"(
     }}}};)");
 
         fmt::print(R"(
     constexpr static wl_interface s_nativeInterface = {{
-        "{}", {}, s_nativeRequests.size(), s_nativeRequests.data(), s_nativeEvents.size(), s_nativeEvents.data(),
+        "{}", s_maxInterfaceVersion, s_nativeRequests.size(), s_nativeRequests.data(), s_nativeEvents.size(), s_nativeEvents.data(),
     }};)",
-                   interface.m_name, interface.m_version);
+                   interface.m_name);
 
-        fmt::print("\n  private:\n    std::unique_ptr<wl_proxy> "
+        fmt::print("\n\n  private:\n    std::unique_ptr<wl_proxy> "
                    "m_nativeHandle;\n");
         fmt::print("}};\n\n");
     };

@@ -1,6 +1,6 @@
-#include <interface.hpp>
+#include <wlpp/interface.hpp>
 
-#include <util.hpp>
+#include <wlpp/util.hpp>
 
 #include <tinyxml2.h>
 
