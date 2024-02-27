@@ -3,32 +3,12 @@
 #include <algorithm>
 #include <cassert>
 #include <cctype>
-#include <numeric>
 #include <ranges>
 
 #include <fmt/format.h>
 
 #include <wlpp/protocol.hpp>
 #include <wlpp/util.hpp>
-
-namespace {
-
-auto argsToWlArgString(std::ranges::input_range auto range,
-                       unsigned int sinceVersion) -> std::string {
-    auto wlArgString = std::string{};
-
-    if (sinceVersion > 1) {
-        wlArgString.append(std::to_string(sinceVersion));
-    }
-
-    for (const auto &elem : range) {
-        wlArgString.append(elem.toWlString());
-    }
-
-    return wlArgString;
-}
-
-} // namespace
 
 void GeneratorHeader::dump(const Protocol &protocol) noexcept {
     auto capitalizedName = protocol.m_name;
@@ -132,84 +112,6 @@ void GeneratorHeader::dump(const Protocol &protocol) noexcept {
 
         fmt::print("\n    [[nodiscard]]\n    auto getNativeHandle() const "
                    "noexcept -> wl_proxy *;\n");
-
-        fmt::print("\n    constexpr static auto s_maxInterfaceVersion = {}u;\n",
-                   interface.m_version);
-
-        if (!interface.m_requests.empty()) {
-            const auto totalArgs = std::accumulate(
-                interface.m_requests.cbegin(), interface.m_requests.cend(), 0,
-                [](const auto &lhs, const auto &rhs) {
-                    return lhs + rhs.m_args.size();
-                });
-            fmt::print(R"(
-    constexpr static std::array<wl_interface *, {}u> s_nativeRequestsParamInterfaces = {{{{
-)",
-                       totalArgs);
-            for (const auto &request : interface.m_requests) {
-                for (const auto &arg : request.m_args) {
-                    if (arg.m_type == ArgType::NewId && arg.m_interface) {
-                        fmt::print("        {}::s_nativeInterface,\n",
-                                   snakeToPascal(*arg.m_interface));
-                    } else {
-                        fmt::print("        nullptr,\n");
-                    }
-                }
-            }
-            fmt::print(R"(}}}};)");
-
-            fmt::print(R"(
-    constexpr static std::array<wl_message, {}u> s_nativeRequests = {{{{)",
-                       interface.m_requests.size());
-
-            size_t currentPos = 0u;
-            for (const auto &request : interface.m_requests) {
-
-                fmt::print(
-                    R"(
-        {{"{}", "{}", const_cast<const wl_interface **>(&s_nativeRequestsParamInterfaces[{}])}},)",
-                    request.m_name,
-                    interface.m_name == "wl_registry" &&
-                            request.m_name == "bind"
-                        ? "usun"
-                        : argsToWlArgString(request.m_args, request.m_since),
-                    currentPos);
-                currentPos += request.m_args.size();
-            }
-            fmt::print(R"(
-    }}}};)");
-        }
-
-        if (!interface.m_events.empty()) {
-            fmt::print(R"(
-    constexpr static std::array<wl_message, {}u> s_nativeEvents = {{{{)",
-                       interface.m_events.size());
-            for (const auto &event : interface.m_events) {
-                fmt::print(R"(
-        {{"{}", "{}", nullptr}},)",
-                           event.m_name,
-                           argsToWlArgString(event.m_args, event.m_since));
-            }
-            fmt::print(R"(
-    }}}};)");
-        }
-
-        fmt::print(
-            R"(
-    constexpr static wl_interface s_nativeInterface = {{
-        "{}",
-        s_maxInterfaceVersion,
-        {},
-        {},
-        {},
-        {},
-    }};)",
-            interface.m_name,
-            interface.m_requests.empty() ? "0" : "s_nativeRequests.size()",
-            interface.m_requests.empty() ? "nullptr"
-                                         : "s_nativeRequests.data()",
-            interface.m_events.empty() ? "0" : "s_nativeEvents.size()",
-            interface.m_events.empty() ? "nullptr" : "s_nativeEvents.data()");
 
         fmt::print("\n\n  private:\n    std::unique_ptr<wl_proxy> "
                    "m_nativeHandle;\n");
